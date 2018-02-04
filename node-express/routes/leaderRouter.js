@@ -31,4 +31,25 @@ leaderRouter
     res.end("Deleting all the leaders!");
   });
 
+  //Rest API calls for leaders
+
+leaderRouter.route("/:leaderId")
+.get((req, res, next) => {
+  res.end("Will send details of the leaders: " + req.params.leaderId + " to you!");
+})
+
+.post((req, res, next) => {
+  res.statusCode = 403;
+  res.end("POST operation not supported on /leaders/" + req.params.leaderId);
+})
+
+.put((req, res, next) => {
+  res.write("Updating the leaders: " + req.params.leaderId + "\n");
+  res.end("Will update the leaders : " + req.body.name + " with details: " + req.body.description);
+})
+
+.delete((req, res, next) => {
+  res.end("Deleting leaders : " + req.params.leaderId);
+});
+
 module.exports = leaderRouter;

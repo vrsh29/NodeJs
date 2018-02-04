@@ -31,4 +31,24 @@ promoRouter
     res.end("Deleting all the promotions!");
   });
 
+  //Rest API calls for promotions
+
+promoRouter.route("/:promoId")
+.get((req, res, next) => {
+  res.end("Will send details of the promotions: " + req.params.promoId + " to you!");
+})
+.post((req, res, next) => {
+  res.statusCode = 403;
+  res.end("POST operation not supported on /promotions/" + req.params.promoId);
+})
+
+.put((req, res, next) => {
+  res.write("Updating the promotions: " + req.params.promoId + "\n");
+  res.end("Will update the promotions: " + req.body.name + " with details: " + req.body.description);
+})
+
+.delete((req, res, next) => {
+  res.end("Deleting promotions : " + req.params.promoId);
+});
+
 module.exports = promoRouter;
