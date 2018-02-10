@@ -1,11 +1,11 @@
-import { signedCookie } from '../../.cache/typescript/2.6/node_modules/@types/cookie-parser';
-
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
+var FileStore = require('session-file-store')(session);
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -13,17 +13,35 @@ var dishRouter = require('./routes/dishRouter');
 var promoRouter = require('./routes/promoRouter');
 var leaderRouter = require('./routes/leaderRouter');
 
-const mongoose = require('mongoose');
+var mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 
 const Dishes = require('./models/dishes');
 
-const url = 'mongodb://127.0.0.1:27071/confusionsever';
-const connect = mongoose.connect(url);
+mongoose.Promise = Promise;
 
-connect.then((db) => {
-  console.log('Connected correcly to server');
-}, (err) => {console.log(err);});
+// mongodb connection
+mongoose.connect("mongodb://localhost:27071/confusion", {
+  useMongoClient: true,
+  promiseLibrary: global.Promise
+});
+
+//const url = 'mongodb://localhost:27071/confusionsever';
+//const connect = mongoose.connect(url);
+
+var db = mongoose.connection;
+
+// mongodb error
+db.on('error', console.error.bind(console, 'connection error:'));
+
+// mongodb connection open
+db.once('open', () => {
+  console.log(`Connected to Mongo at: ${new Date()}`)
+});
+
+// connect.then((db) => {
+//   console.log('Connected correcly to server');
+// }, (err) => {console.log(err);});
 
 var app = express();
 
@@ -37,15 +55,20 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 //supply secret key
-app.use(cookieParser('2345-67890-09876-54321'));
-
+//app.use(cookieParser('2345-67890-09876-54321'));
+app.use(session({
+  name: 'session-id',
+  secret: '12345-67890-09876-54321',
+  saveUninitialized: false,
+  resave: false,
+  store: new FileStore()
+}));
 
 function auth(req, res, next) {
-  console.log(req.signedCookies);
+  console.log(req.session);
 
-  if(!req.signedCookies.user) {
+  if(!req.session.user) {
   var authHeader = req.headers.authorization;
-
   if(!authHeader){
     var err = new Error("You are not authenticated");
     res.setHeader('WWW-Authenticate', 'Basic');
@@ -54,21 +77,23 @@ function auth(req, res, next) {
   }
 
   var auth = new Buffer(authHeader.split('')[1], 'base64').toString().split(':');
-  var username = auth[0];
-  var password = auth[1];
+  var user = auth[0];
+  var pass = auth[1];
 
-  if (user == 'admin' && pass === 'password') {
-    res.cookie('user','admin', {signed: true});
+  if (user == 'admin' && pass == 'password') {
+    req.session.user = 'admin';
+   // res.cookie('user','admin', {signed: true});
     next(); //authorized
   } else {
     var err = new Error("You are not authenticated");
-    res.setHeader('WWW-Authenticate', 'Basic');
+    res.setHeader('WWW-Authenticate','Basic');
     err.status = 401;
     return next(err);
   }
  }
  else {
-   if(req.signedCookies.user === 'admin') {
+   if(req.session.user === 'admin') {
+     console.log('req.session',res.session)
      next();
    }
    else {
