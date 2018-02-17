@@ -34,7 +34,7 @@ router.post('/login', passport.authenticate('local'), (req,res,next) => {
     res.statusCode = 200;
     res.setHeader('Content-type','application/json');
     res.json({success: true, status: 'You are Successfully logged in'});
-})
+});
 
 //removes session from server-side & delete cookie from client side
 router.get('/logout',(req,res) => {

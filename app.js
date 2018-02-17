@@ -76,7 +76,8 @@ function auth(req, res, next) {
 
   if(!req.user) {
   var err = new Error('You are not authenticated');
-  err.status = 403;
+  res.setHeader('WWW-Authenticate','Basic')
+  err.status = 401;
   return next(err);
   }
   else {
