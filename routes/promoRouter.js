@@ -1,7 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
-const authenticate = require('../authenticate')
+const authenticate = require('../authenticate');
+const cors = require("./cors");
 
 const Promos = require('../models/promotions');
 
@@ -11,7 +12,10 @@ promoRouter.use(bodyParser.json());
 
 promoRouter
   .route("/")
-  .get((req, res, next) => {
+  .options(cors.corsWithOptions, (req, res) => {
+    res.sendStatus = 200;
+  })
+  .get(cors.cors, (req, res, next) => {
     Promos.find({})
       .then(
         promos => {
@@ -55,7 +59,10 @@ promoRouter
 
 promoRouter
   .route(":/promoId")
-  .get((req, res, next) => {
+  .options(cors.corsWithOptions, (req, res) => {
+    res.sendStatus = 200;
+  })
+  .get(cors.cors, (req, res, next) => {
     Promos.findById(req.params.promoId)
       .then(
         promo => {
@@ -67,13 +74,13 @@ promoRouter
       )
       .catch(err => next(err));
   })
-  .post(authenticate.verifyUser, (req, res, next) => {
+  .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 403;
     res.end(
       "POST operation not supported on /promotions/" + req.params.promoId
     );
   })
-  .put(authenticate.verifyUser, (req, res, next) => {
+  .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Promos.findByIdAndUpdate(
       req.params.promoId,
       {
@@ -91,7 +98,7 @@ promoRouter
       )
       .catch(err => next(err));
   })
-  .delete(authenticate.verifyUser, (req, res, next) => {
+  .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Promos.findByIdAndRemove(req.params.promoId)
       .then(
         response => {
