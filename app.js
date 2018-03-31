@@ -16,6 +16,7 @@ var dishRouter = require('./routes/dishRouter');
 var promoRouter = require('./routes/promoRouter');
 var leaderRouter = require('./routes/leaderRouter');
 var uploadRouter = require('./routes/uploadRouter');
+var favoriteRouter = require("./routes/favoriteRouter");
 
 var mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
@@ -47,9 +48,7 @@ db.once('open', () => {
   console.log(`Connected to Mongo at: ${new Date()}`)
 });
 
-// connect.then((db) => {
-//   console.log('Connected correcly to server');
-// }, (err) => {console.log(err);});
+
 
 var app = express();
 
@@ -94,6 +93,7 @@ app.use('/dishes', dishRouter);
 app.use('/promotions', promoRouter);
 app.use('/leaders', leaderRouter);
 app.use('/imageUpload', uploadRouter);
+app.use("/favorites", favoriteRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
