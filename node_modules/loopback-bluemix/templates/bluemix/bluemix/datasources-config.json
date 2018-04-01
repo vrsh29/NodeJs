@@ -1,0 +1,14 @@
+{
+  "datasources": {},
+  "supportedServices": {
+    "cloudant": {
+      "label": "cloudantNoSQLDB"
+    },
+    "mongodb": {
+      "label": "compose-for-mongodb"
+    },
+    "ibm-object-storage": {
+      "label": "Object-Storage"
+    }
+  }
+}

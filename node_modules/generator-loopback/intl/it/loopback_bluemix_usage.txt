@@ -1,0 +1,3 @@
+Descrizione:
+  `toolchain`, `manifest` e `docker` sono opzioni scaffold. La specifica di nessuna opzione
+  equivale alla specifica di tutte le opzioni.
